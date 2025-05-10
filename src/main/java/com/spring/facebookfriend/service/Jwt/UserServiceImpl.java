@@ -2,11 +2,11 @@ package com.spring.facebookfriend.service.Jwt;
 
 import com.spring.facebookfriend.config.Jwt.TokenHandler;
 import com.spring.facebookfriend.dtos.Jwt.UsersDto;
-import com.spring.facebookfriend.mapper.UserMapper;
+import com.spring.facebookfriend.mapper.Jwt.UserMapper;
 import com.spring.facebookfriend.model.jwt.Roles;
 import com.spring.facebookfriend.model.jwt.Users;
-import com.spring.facebookfriend.repo.RolesRepo;
-import com.spring.facebookfriend.repo.UsersRepo;
+import com.spring.facebookfriend.repo.Jwt.RolesRepo;
+import com.spring.facebookfriend.repo.Jwt.UsersRepo;
 import jakarta.transaction.SystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,8 +50,9 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        return usersRepo.findByEmail(email);
+        return usersRepo.findByEmailWithRoles(email); // loads roles eagerly
     }
+
 
     @Override
     public void createUser(UsersDto usersDto) throws SystemException {

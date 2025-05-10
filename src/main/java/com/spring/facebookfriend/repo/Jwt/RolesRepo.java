@@ -1,4 +1,4 @@
-package com.spring.facebookfriend.repo;
+package com.spring.facebookfriend.repo.Jwt;
 
 import com.spring.facebookfriend.model.jwt.Roles;
 import org.springframework.data.jpa.repository.JpaRepository;

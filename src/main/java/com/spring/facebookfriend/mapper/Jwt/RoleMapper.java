@@ -1,4 +1,4 @@
-package com.spring.facebookfriend.mapper;
+package com.spring.facebookfriend.mapper.Jwt;
 
 import com.spring.facebookfriend.dtos.Jwt.RolesDto;
 import com.spring.facebookfriend.model.jwt.Roles;

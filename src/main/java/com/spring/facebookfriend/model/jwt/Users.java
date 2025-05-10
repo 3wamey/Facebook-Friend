@@ -1,10 +1,8 @@
 package com.spring.facebookfriend.model.jwt;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import com.spring.facebookfriend.model.ContactUs;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,6 +27,12 @@ public class Users extends UsersBaseEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id") // FK to Roles
     )
     private List<Roles> roles = new ArrayList<>();
+
+
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ContactUs> contactus = new ArrayList<>();
 
 
 }

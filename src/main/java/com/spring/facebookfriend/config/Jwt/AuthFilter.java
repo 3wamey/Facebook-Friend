@@ -26,72 +26,64 @@ public class AuthFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserService userService;
+
     @Autowired
     private TokenHandler tokenHandler;
 
+    // Skip filtering for login/register
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-
+    protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        if (path.contains("login") || path.contains("register")) {
-            return true;
-        }
-
-        return false;
+        return path.contains("login") || path.contains("register");
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+
         String token = request.getHeader("Authorization");
+
         if (token == null || !token.startsWith("Bearer ")) {
-            response.reset();
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing or invalid Authorization header.");
             return;
         }
-        token = token.substring(7);
+
+        token = token.substring(7); // Strip "Bearer "
+
         if (!tokenHandler.validateToken(token)) {
-            response.reset();
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token.");
             return;
         }
 
+        Users user;
         try {
-            Users users = userService.checkUserExistByToken(token);
-            if (users == null) {
-                response.reset();
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
-            }
-
-
-            //  here  we need to tell the second filter which is spring  security filter that   the user signrd in
-
-
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(users, null, getAuthorities(users.getRoles()));
-
-
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            filterChain.doFilter(request, response);
-
-        } catch (SystemException e) {
-            throw new RuntimeException(e);
+            user = userService.checkUserExistByToken(token);
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Token parsing failed.");
+            return;
         }
+
+        if (user == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User not found.");
+            return;
+        }
+
+        // Set user authentication in Spring Security context
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(user, null, getAuthorities(user.getRoles()));
+
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        // Continue to next filter
+        filterChain.doFilter(request, response);
     }
 
-
-    // this function just to convert the clientForSpringSecurity.getAuthortiesForClients() to GrantedAuthority
-
-
-    private List<GrantedAuthority> getAuthorities(List<Roles> Auth) {
-
-        List<GrantedAuthority> roles = new ArrayList<>(); //client.getAuthortiesForClients();
-
-        for (Roles role : Auth) {
-            SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getCode());
-            roles.add(grantedAuthority);
+    private List<GrantedAuthority> getAuthorities(List<Roles> rolesList) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (Roles role : rolesList) {
+            authorities.add(new SimpleGrantedAuthority(role.getCode()));
         }
-
-        return roles;
+        return authorities;
     }
 }
