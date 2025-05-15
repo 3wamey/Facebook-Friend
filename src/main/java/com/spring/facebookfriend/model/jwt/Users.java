@@ -2,6 +2,7 @@ package com.spring.facebookfriend.model.jwt;
 
 
 import com.spring.facebookfriend.model.ContactUs;
+import com.spring.facebookfriend.model.Friends;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,5 +35,7 @@ public class Users extends UsersBaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<ContactUs> contactus = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Friends> friends = new ArrayList<>();
 
 }

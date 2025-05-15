@@ -1,4 +1,4 @@
-package com.spring.facebookfriend.controller;
+package com.spring.facebookfriend.controller.Jwt;
 
 
 import com.spring.facebookfriend.dtos.Jwt.TokenDto;

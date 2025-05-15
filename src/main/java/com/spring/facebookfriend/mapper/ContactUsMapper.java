@@ -15,7 +15,7 @@ public interface ContactUsMapper {
 
         ContactUsMapper INSTANCE = Mappers.getMapper(ContactUsMapper.class);
 
-        @Mapping(source = "user.id", target = "clientId")
+        @Mapping(source = "user.id", target = "userId")
         ContactUsDto toDto(ContactUs contactUs);
 
         @InheritInverseConfiguration

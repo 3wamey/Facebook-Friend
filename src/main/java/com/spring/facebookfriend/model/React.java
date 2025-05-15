@@ -1,6 +1,5 @@
 package com.spring.facebookfriend.model;
 
-import com.spring.facebookfriend.model.jwt.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,22 +10,20 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-public class Friends {
+public class React {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
     private String name;
-   private String email;
-   private String imageUrl;
+    private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users user;
 
-    @OneToMany(mappedBy = "friend", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "reactions")
     private List<Post> posts = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "reactions")
+    private List<Comment> comments = new ArrayList<>();
+
 
 }
